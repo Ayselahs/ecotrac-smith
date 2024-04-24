@@ -1,6 +1,7 @@
 import { Schema, model, models } from 'mongoose'
 import bcrypt from 'bcrypt'
 import PlaneSchema from './plane'
+import TrainSchema from './train'
 
 const UserSchema = new Schema({
   username: {
@@ -15,7 +16,8 @@ const UserSchema = new Schema({
     maxLength: 200
   },
 
-  planeEmission: [PlaneSchema]
+  planeEmission: [PlaneSchema],
+  trainEmission: [TrainSchema]
 })
 
 // hashes the password before it's stored in mongo

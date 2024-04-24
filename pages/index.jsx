@@ -8,6 +8,7 @@ import styles from "../styles/Home.module.css";
 import Header from "../components/header";
 import useLogout from "../hooks/useLogout";
 
+
 export const getServerSideProps = withIronSessionSsr(
   async function getServerSideProps({ req }) {
     const user = req.session.user;
@@ -36,6 +37,7 @@ export default function Home(props) {
 
       <Header isLoggedIn={props.isLoggedIn} username={props?.user?.username} />
 
+
       <main className={styles.main}>
         <h1 className={styles.title}>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
@@ -53,7 +55,8 @@ export default function Home(props) {
         <div className={styles.grid}>
           {props.isLoggedIn ? (
             <>
-              <Link href="/dashboard" className={styles.card}>
+
+              <Link href="/loggedDashboard" className={styles.card}>
                 <h2>Dashboard &rarr;</h2>
                 <p>This page is only visible if you are logged in.</p>
               </Link>
@@ -82,6 +85,9 @@ export default function Home(props) {
           )}
         </div>
       </main>
+
+
+
 
       <footer className={styles.footer}>
         <a

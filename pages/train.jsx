@@ -5,10 +5,15 @@ import { useTravelContext } from "../context/travel";
 import styles from "../styles/Home.module.css";
 import * as actions from '../context/travel/actions'
 import { useState, useRef } from 'react'
+import { Router } from "next/router";
+import { fetchTrain } from '../util/carbonInterface';
+import Sidebar from "../components/Sidebar";
+import { Container, Row, Col, Navbar, Nav, Card, Form, Button } from 'react-bootstrap';
 
 export const getServerSideProps = withIronSessionSsr(
     async function getServerSideProps({ req }) {
         const { user } = req.session;
+        console.log("User", user)
         const props = {};
         if (user) {
             props.user = req.session.user;
@@ -19,94 +24,122 @@ export const getServerSideProps = withIronSessionSsr(
     sessionOptions
 )
 
-export default function Train(props) {
-    const [{ emissionsResult }, dispatch] = useTravelContext()
-    const [origin, setOrigin] = useState("")
-    const [destination, setDestination] = useState("")
-    const [passengers, setPassengers] = useState(1)
+export default function Car(props) {
+    const [{ emissionsResultTrain }, dispatch] = useTravelContext()
+    const [distanceUnit, setDistanceUnit] = useState("mi")
+    const [distanceValue, setDistanceValue] = useState("")
     const [fetching, setFetching] = useState(false)
 
 
-
-    async function handleSubmit(e) {
-        e.preventDefault()
-        if (fetching || !origin.trim() || !destination.trim()) return
+    async function displayOnDashboard(data) {
+        if (fetching || !distance.trim()) return
         setFetching(true)
         const res = await fetch(
-            `https://www.carboninterface.com/api/v1/estimates`, {
+            `/api/saveTrain`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
             },
-            body: JSON.stringify(
-                {
-                    travel_mode: "rail",
-                    origin: {
-                        name: origin
-                    },
-                    destination: {
-                        name: destination
-                    },
-                    passengers: passengers,
-                    emission_factor: {
-                        "id": "943d0e87-c297-4e89-82d8-d6eecea798ae"
-                    },
-                    parameters: {
-                        "passengers": 4,
-                        "distance": 100,
-                        "distance_unit": "km"
-                    }
-
-
-                }
-            )
-
-
+            body: JSON.stringify({
+                emissionsResultTrain: data,
+                userId: props.user.id
+            })
         })
 
-
-        const data = await res.json()
-        console.log("data: ", data)
-
-        //if (res.status !== 200) return
-
-        console.log("data: ", data)
-        dispatch({
-            action: actions.CALCULATE_EMISSIONS,
-            payload: {
-                origin,
-                destination,
-                emissions: data.co2e
-            }
-        })
-        console.log("Sending request with:", { origin, destination, passengers, flightClass });
-        console.log("Emissions", emissionsResult)
+        const postData = await res.json()
+        console.log(postData)
         setFetching(false)
+
+    }
+
+    async function handleSubmit(e) {
+        e.preventDefault()
+        setFetching(true)
+        try {
+            const data = await fetchTrain(distanceUnit, distanceValue)
+            console.log("Emission data:", data)
+
+            console.log("data: ", data)
+            dispatch({
+                action: actions.CALCULATE_TRAIN_EMISSIONS,
+                payload: {
+                    unit: distanceUnit,
+                    distance: distanceValue,
+                    emissions: data.data.attributes.carbon_g
+                }
+            })
+            await displayOnDashboard(data)
+            console.log("Session user:", req.session.user);
+        } catch (err) {
+            console.error("API error", err.message)
+            if (err.message === 'Failed to fetch') {
+                Router.push('/login')
+            }
+        } finally {
+            setFetching(false)
+        }
+
+
+
 
 
     }
 
+
+
     return (
-        <div>
-            <h1>Train Emission Calculator</h1>
-            <form onSubmit={handleSubmit}>
-                <input type="text" value={origin} onChange={(e) => setOrigin(e.target.value)} placeholder="Origin" />
-                <input type="text" value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Destination" />
-                <input type="number" value={passengers} onChange={(e) => setPassengers(e.target.value)} placeholder="Passengers" />
-                <button type="submit" disabled={fetching}>Calculate Emissions</button>
-            </form>
-            {fetching && <p>Loading..</p>}
-            {emissionsResult && (
-                <div>
-                    <p>Carbon Emissions for your train ride from {emissionsResult.origin} to {emissionsResult.destination}: {emissionsResult.emissions} kg CO2</p>
-                </div>
-            )}
-            <Link href="/dashboard" className={styles.card}>
-                <h2>Dashboard Logged &rarr;</h2>
-                <p>Return to the homepage.</p>
-            </Link>
+        <div className="d-flex">
+            <Sidebar />
+            <Container className="d-flex justify-content-center align-items-center min-vh-100">
+                <Row className="border rounded-5 p-3 bg-white-shadow">
+                    <Col md={6}>
+                        <Row className="align-items-center">
+                            <div className="mb-4">
+                                <h2>Train Emission Calculator</h2>
+                                <p>Fill in the details to calculate the CO₂ emissions for your train ride.</p>
+                            </div>
+                            <Form onSubmit={handleSubmit} className="w-100">
+                                <Form.Group className="mb-3">
+                                    <Form.Control type="number" value={distanceValue} onChange={(e) => setDistanceValue(e.target.value)} placeholder="Distance" />
+                                </Form.Group>
+                                <Form.Group className="mb-3">
+                                    <Form.Select value={distanceUnit} onChange={(e) => setDistanceUnit(e.target.value)}>
+                                        <option value="km">km</option>
+                                        <option value="mi">mi</option>
+                                    </Form.Select>
+                                </Form.Group>
+                                <Button variant="primary" type="submit" disabled={fetching} className="btn-lg btn-primary w-100">Calculate Emissions</Button>
+                            </Form>
+                        </Row>
+
+                    </Col>
+
+                    <Col md={6} className="rounded-4 d-flex justify-content-center align-items-center flex-column" style={{ background: '#103cbe' }}>
+                        {fetching}
+                        {emissionsResultTrain ? (
+                            <div>
+                                <h3 className="text-white mb-3">Emission Results</h3>
+                                <p className="text-white"> Carbon Emissions for your train ride from {emissionsResultTrain.distanceValue} {emissionsResultTrain.distanceUnit}: {emissionsResultTrain.emissions} g CO2 </p>
+                            </div>
+
+                        ) : (
+                            <div>
+                                <h3 className="text-white mb-3">Awaiting Calculations</h3>
+                                <p className="text-white">Enter details to see emission results</p>
+                            </div>
+                        )}
+                    </Col>
+
+
+                </Row>
+            </Container >
         </div>
+
+
+
+
+
+
     )
 
 

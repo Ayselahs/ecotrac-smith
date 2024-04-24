@@ -8,6 +8,7 @@ import sessionOptions from "../config/session";
 import Header from "../components/header";
 import useLogout from "../hooks/useLogout";
 
+
 export const getServerSideProps = withIronSessionSsr(
   async function getServerSideProps({ req }) {
     const user = req.session.user;
@@ -36,47 +37,52 @@ export default function Dashboard(props) {
 
       <Header isLoggedIn={props.isLoggedIn} username={props.user.username} />
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to a <a href="https://nextjs.org">Next.js!</a> Dashboard Page!
-        </h1>
+      <div className="container-fluid">
+        <div className="row">
+          <Sidebar />
+          <main className={styles.main}>
+            <h1 className={styles.title}>
+              Welcome to a <a href="https://nextjs.org">Next.js!</a> Dashboard Page!
+            </h1>
 
-        <p className={styles.description}>
-          Current Location: <code className={styles.code}>{router.asPath}</code>
-          <br />
-          Status:{" "}
-          <code className={styles.code}>
-            {!props.isLoggedIn && " Not"} Logged In
-          </code>
-        </p>
+            <p className={styles.description}>
+              Current Location: <code className={styles.code}>{router.asPath}</code>
+              <br />
+              Status:{" "}
+              <code className={styles.code}>
+                {!props.isLoggedIn && " Not"} Logged In
+              </code>
+            </p>
 
-        <p className={styles.description}>
-          This page is only visible if you are logged in.
-        </p>
+            <p className={styles.description}>
+              This page is only visible if you are logged in.
+            </p>
 
-        <div className={styles.grid}>
-          <Link href="/" className={styles.card}>
-            <h2>Home &rarr;</h2>
-            <p>Return to the homepage.</p>
-          </Link>
-          <Link href="/plane" className={styles.card}>
-            <h2>Plane Emissions &rarr;</h2>
-            <p>Go to Emission.</p>
-          </Link>
-          <Link href="/train" className={styles.card}>
-            <h2>Train Emissions &rarr;</h2>
-            <p>Go to Emission.</p>
-          </Link>
-          <div
-            onClick={logout}
-            style={{ cursor: "pointer" }}
-            className={styles.card}
-          >
-            <h2>Logout &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </div>
+            <div className={styles.grid}>
+              <Link href="/" className={styles.card}>
+                <h2>Home &rarr;</h2>
+                <p>Return to the homepage.</p>
+              </Link>
+              <Link href="/plane" className={styles.card}>
+                <h2>Plane Emissions &rarr;</h2>
+                <p>Go to Emission.</p>
+              </Link>
+              <Link href="/train" className={styles.card}>
+                <h2>Train Emissions &rarr;</h2>
+                <p>Go to Emission.</p>
+              </Link>
+              <div
+                onClick={logout}
+                style={{ cursor: "pointer" }}
+                className={styles.card}
+              >
+                <h2>Logout &rarr;</h2>
+                <p>Learn about Next.js in an interactive course with quizzes!</p>
+              </div>
+            </div>
+          </main>
         </div>
-      </main>
+      </div>
 
       <footer className={styles.footer}>
         <a

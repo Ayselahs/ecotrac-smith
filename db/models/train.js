@@ -1,15 +1,11 @@
 import { Schema } from 'mongoose'
 
 const TrainSchema = new Schema({
-    origin: {
+    distance_unit: {
         type: String,
         required: true,
     },
-    destination: {
-        type: String,
-        required: true,
-    },
-    passengers: {
+    distance_value: {
         type: Number,
         required: true,
     },

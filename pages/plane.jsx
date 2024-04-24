@@ -7,6 +7,8 @@ import * as actions from '../context/travel/actions'
 import { useState, useRef } from 'react'
 import { Router } from "next/router";
 import { fetchEmission } from '../util/carbonInterface';
+import Sidebar from "../components/Sidebar";
+import { Container, Row, Col, Navbar, Nav, Card, Form, Button } from 'react-bootstrap';
 
 export const getServerSideProps = withIronSessionSsr(
     async function getServerSideProps({ req }) {
@@ -62,7 +64,7 @@ export default function Plane(props) {
 
             console.log("data: ", data)
             dispatch({
-                action: actions.CALCULATE_EMISSIONS,
+                action: actions.CALCULATE_CAR_EMISSIONS,
                 payload: {
                     origin,
                     destination,
@@ -90,29 +92,60 @@ export default function Plane(props) {
 
 
     return (
-        <div>
-            <h1>Flight Emission Calculator</h1>
-            <form onSubmit={handleSubmit}>
-                <input type="text" value={origin} onChange={(e) => setOrigin(e.target.value)} placeholder="Origin Code" />
-                <input type="text" value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Destination Code" />
-                <input type="number" value={passengers} onChange={(e) => setPassengers(e.target.value)} placeholder="Passengers" />
-                <select value={flightClass} onChange={(e) => setFlightClass(e.target.value)}>
-                    <option value="economy">Economy</option>
-                    <option value="premium">Premium</option>
-                </select>
-                <button type="submit" disabled={fetching}>Calculate Emissions</button>
-            </form>
-            {fetching && <p>Loading..</p>}
-            {emissionsResult && (
-                <div>
-                    <p>Carbon Emissions for your flight from {emissionsResult.origin} to {emissionsResult.destination}: {emissionsResult.emissions} kg CO2</p>
-                </div>
-            )}
-            <Link href="/loggedDashboard" className={styles.card}>
-                <h2>Dashboard Logged &rarr;</h2>
-                <p>Return to the homepage.</p>
-            </Link>
+        <div className="d-flex">
+            <Sidebar />
+            <Container className="d-flex justify-content-center align-items-center min-vh-100">
+                <Row className="border rounded-5 p-3 bg-white-shadow">
+                    <Col md={6}>
+                        <Row className="align-items-center">
+                            <div className="mb-4">
+                                <h2>Flight Emission Calculator</h2>
+                                <p>Fill in the details to calculate the CO₂ emissions for your car journey.</p>
+                            </div>
+                            <Form onSubmit={handleSubmit} className="w-100">
+                                <Form.Group className="mb-3">
+                                    <Form.Control type="text" value={origin} onChange={(e) => setOrigin(e.target.value)} placeholder="Origin Code" />
+                                </Form.Group>
+                                <Form.Group className="mb-3">
+                                    <Form.Control type="text" value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Destination Code" />
+                                </Form.Group>
+                                <Form.Group className="mb-3">
+                                    <Form.Control type="number" value={passengers} onChange={(e) => setPassengers(e.target.value)} placeholder="Passengers" />
+                                </Form.Group>
+                                <Form.Group className="mb-3">
+                                    <Form.Select value={flightClass} onChange={(e) => setFlightClass(e.target.value)}>
+                                        <option value="economy">Economy</option>
+                                        <option value="premium">Premium</option>
+                                    </Form.Select>
+                                </Form.Group>
+                                <Button variant="primary" type="submit" disabled={fetching} className="btn-lg btn-primary w-100">Calculate Emissions</Button>
+                            </Form>
+                        </Row>
+
+                    </Col>
+
+                    <Col md={6} className="rounded-4 d-flex justify-content-center align-items-center flex-column" style={{ background: '#103cbe' }}>
+                        {fetching}
+                        {emissionsResult ? (
+                            <div>
+                                <h3 className="text-white mb-3">Emission Results</h3>
+                                <p className="text-white"> Carbon Emissions for your flight from {emissionsResult.origin} to {emissionsResult.destination}: {emissionsResult.emissions} kg CO2 </p>
+                            </div>
+
+                        ) : (
+                            <div>
+                                <h3 className="text-white mb-3">Awaiting Calculations</h3>
+                                <p className="text-white">Enter details to see emission results</p>
+                            </div>
+                        )}
+                    </Col>
+
+
+                </Row>
+            </Container >
         </div>
+        
+
     )
 
 
