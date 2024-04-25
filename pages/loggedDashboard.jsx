@@ -6,7 +6,7 @@ import User from '../db/models/user';
 import dbConnect from "../db/util/connection";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/header";
-import { Container, Row, Col, Navbar, Nav, Card, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Navbar, Nav, Card, Form, Button, Table } from 'react-bootstrap';
 
 
 
@@ -76,56 +76,63 @@ export default function loggedDashboard({ user, emissions }) {
                     <Sidebar />
                 </Col>
 
-                <main className="col-md-9 ml-sm-auto col-lg-9 px-md-4">
-                    <h2>{user.username}'s Emissions Dashboard</h2>
-                    <Row>
-                        {emissions && emissions.length > 0 ? (
-                            emissions.map((emission, index) => (
-                                <Col key={index} className="col-md-6 col-lg-4 mb-4">
-                                    <Card>
-                                        <Card.Body>
-                                            <Card.Title>
-                                                Date: {new Date(emission.dateCalculated).toLocaleDateString()}
-                                            </Card.Title>
-                                            <ul className="list-unstyled">
+                <Col md={9}>
+                    <h2 className="text-center">{user.username}'s Emissions Dashboard</h2>
+                    <div className="table-responsive">
+                        <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Details</th>
+                                    <th>Passengers</th>
+                                    <th>Emissions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {emissions && emissions.length > 0 ? (
+                                    emissions.map((emission, index) => (
+                                        <tr key={index}>
+                                            <td> Date: {new Date(emission.dateCalculated).toLocaleDateString()}</td>
+                                            <td>{emission.type}</td>
+                                            <td>
                                                 {emission.type === 'plane' ? (
-                                                    <>
-                                                        <li>Passengers: {emission.passengers}</li>
-                                                        <li>Emissions: {emission.emissions}kg CO2</li>
-                                                        {emission.legs.map((leg, legIndex) => (
-                                                            <li key={legIndex}>
-                                                                {leg.departure_airport} to {leg.destination_airport} ({leg.cabin_class})
-                                                            </li>
-                                                        ))}
-                                                    </>
+                                                    emission.legs.map((leg, legIndex) => (
+                                                        <span key={legIndex}>
+                                                            {leg.departure_airport} to {leg.destination_airport} ({leg.cabin_class})
+                                                        </span>
+                                                    ))
                                                 ) : (
-                                                    <>
-                                                        <li>Distance: {emission.distance_value} {emission.distance_unit}</li>
-                                                        <li>Emissions: {emission.emissions}g CO2</li>
-                                                    </>
-
+                                                    `Distance: ${emission.distance_value} ${emission.distance_unit}`
                                                 )}
+                                            </td>
+                                            <td>{emission.type === 'plane' ? emission.passengers : 'N/A'}</td>
+                                            <td> {emission.emissions} {emission.type === 'plane' ? 'kg' : 'g'} CO2</td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="5" className="text-center">No emission data</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </Table>
+                    </div>
 
 
 
 
-                                            </ul>
-                                        </Card.Body>
-                                    </Card>
 
 
 
-                                </Col>
-                            ))
 
-                        ) : (
-                            <p className="text-center"> No emission data</p>
-                        )}
-                    </Row>
 
-                </main>
+
+
+                </Col>
             </Row>
-        </Container>
+
+        </Container >
 
 
     )
