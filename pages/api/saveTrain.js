@@ -16,7 +16,7 @@ export default withIronSessionApiRoute(
             case 'POST':
                 try {
                     const { emissionsResultTrain } = req.body
-                    console.log("emissionsResult", emissionsResultTrain)
+                    console.log("emissionsResultTrain", emissionsResultTrain)
 
                     if (!userId) {
                         req.session.destroy()

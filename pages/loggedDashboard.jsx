@@ -46,10 +46,11 @@ export const getServerSideProps = withIronSessionSsr(
 
         console.log("User data:", userId)
         console.log("emissions", planeEmissions)
+        console.log("emissions", trainEmissions)
 
         return {
             props: {
-                emissions: [planeEmissions, trainEmissions],
+                emissions: [...planeEmissions, ...trainEmissions],
                 user: {
                     ...user,
                     _id: user._id.toString()
@@ -99,7 +100,7 @@ export default function loggedDashboard({ user, emissions }) {
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <li>Distance: {emission.distanceValue} {emission.distanceUnit}</li>
+                                                        <li>Distance: {emission.distance_value} {emission.distance_unit}</li>
                                                         <li>Emissions: {emission.emissions}g CO2</li>
                                                     </>
 

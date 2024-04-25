@@ -64,7 +64,7 @@ export default function Plane(props) {
 
             console.log("data: ", data)
             dispatch({
-                action: actions.CALCULATE_CAR_EMISSIONS,
+                action: actions.CALCULATE_EMISSIONS,
                 payload: {
                     origin,
                     destination,
@@ -144,7 +144,7 @@ export default function Plane(props) {
                 </Row>
             </Container >
         </div>
-        
+
 
     )
 

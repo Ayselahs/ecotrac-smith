@@ -3,7 +3,7 @@ import User from '../models/user'
 
 export async function saveTrain(userId, emissionsResultTrain) {
     if (!emissionsResultTrain || !emissionsResultTrain.data) {
-        console.error("emissionsResult is undefined")
+        console.error("emissionsResultTrain is undefined")
         return null
     }
     await dbConnect()
@@ -11,8 +11,8 @@ export async function saveTrain(userId, emissionsResultTrain) {
     const emissionTrainData = {
         distance_value: emissionsResultTrain.data.attributes.distance_value,
         distance_unit: emissionsResultTrain.data.attributes.distance_unit,
-        emissions: emissionsResult.data.attributes.carbon_kg,
-        dateCalculated: new Date(emissionsResult.data.attributes.estimated_at)
+        emissions: emissionsResultTrain.data.attributes.carbon_g,
+        dateCalculated: new Date(emissionsResultTrain.data.attributes.estimated_at)
     }
 
     console.log("Attempting to update user with ID:", userId);

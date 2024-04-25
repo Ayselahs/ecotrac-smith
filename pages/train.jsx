@@ -32,7 +32,7 @@ export default function Car(props) {
 
 
     async function displayOnDashboard(data) {
-        if (fetching || !distance.trim()) return
+        if (fetching || !distanceValue.trim()) return
         setFetching(true)
         const res = await fetch(
             `/api/saveTrain`, {
@@ -46,8 +46,8 @@ export default function Car(props) {
             })
         })
 
-        const postData = await res.json()
-        console.log(postData)
+        const postTrainData = await res.json()
+        console.log(postTrainData)
         setFetching(false)
 
     }
@@ -63,8 +63,8 @@ export default function Car(props) {
             dispatch({
                 action: actions.CALCULATE_TRAIN_EMISSIONS,
                 payload: {
-                    unit: distanceUnit,
-                    distance: distanceValue,
+                    distanceUnit: distanceUnit,
+                    distanceValue: distanceValue,
                     emissions: data.data.attributes.carbon_g
                 }
             })
@@ -119,7 +119,7 @@ export default function Car(props) {
                         {emissionsResultTrain ? (
                             <div>
                                 <h3 className="text-white mb-3">Emission Results</h3>
-                                <p className="text-white"> Carbon Emissions for your train ride from {emissionsResultTrain.distanceValue} {emissionsResultTrain.distanceUnit}: {emissionsResultTrain.emissions} g CO2 </p>
+                                <p className="text-white"> Carbon Emissions for your train ride from {emissionsResultTrain.distanceValue} {emissionsResultTrain.distanceUnit}: {emissionsResultTrain.emissions} G CO2 </p>
                             </div>
 
                         ) : (

@@ -24,7 +24,10 @@ export async function fetchEmission(origin, destination, passengers, flightClass
 
 
     })
-    if (!res.ok) throw new Error('Failed to fetch API')
+    if (!res.ok) {
+        const err = await res.text()
+        throw new Error(`Failed to fetch API :  ${err}`)
+    }
     return await res.json()
 }
 
@@ -49,6 +52,9 @@ export async function fetchTrain(distanceUnit, distanceValue) {
         )
     }
     )
-    if (!res.ok) throw new Error('Failed to fetch API')
+    if (!res.ok) {
+        const err = await res.text()
+        throw new Error(`Failed to fetch API :  ${err}`)
+    }
     return await res.json()
 }
