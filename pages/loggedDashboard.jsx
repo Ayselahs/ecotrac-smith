@@ -77,7 +77,7 @@ export default function loggedDashboard({ user, emissions }) {
                 </Col>
 
                 <Col md={9}>
-                    <h2 className="text-center">{user.username}'s Emissions Dashboard</h2>
+                    <h2 className="text-center">{user.username} Emissions Dashboard</h2>
                     <div className="table-responsive">
                         <Table striped bordered hover>
                             <thead>
